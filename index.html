@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅遊拍照記帳助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-20">
+
+    <div class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-md">
+        <h1 class="text-xl font-bold text-center">我的旅遊帳本</h1>
+        <div class="flex justify-between mt-3 text-sm">
+            <select id="currency" class="bg-blue-500 border border-blue-400 rounded px-2 py-1" onchange="updateExchangeRate()">
+                <option value="KRW">韓國 (KRW)</option>
+                <option value="THB">泰國 (THB)</option>
+                <option value="JPY">日本 (JPY)</option>
+            </select>
+            <div>
+                匯率: 1 TWD = <input type="number" id="rate" value="42" class="w-16 bg-blue-500 border-b border-white text-center outline-none"> <span id="unit">KRW</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4">
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-xs text-gray-500">當地金額</label>
+                    <input type="number" id="localPrice" placeholder="0" class="w-full text-2xl font-bold border-b border-gray-200 outline-none" oninput="calcTWD()">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500">換算台幣 (TWD)</label>
+                    <input type="text" id="twdPrice" readonly class="w-full text-2xl font-bold text-blue-600 border-b border-gray-200" value="0">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <input type="text" id="storeName" placeholder="店家名稱 (如: Olive Young)" class="w-full p-2 border rounded-lg text-sm">
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <select id="category" class="flex-1 p-2 border rounded-lg text-sm bg-gray-50">
+                    <option>🛍️ 購物</option>
+                    <option>🍱 美食</option>
+                    <option>🚌 交通</option>
+                    <option>🏨 住宿</option>
+                </select>
+                <input type="date" id="date" class="flex-1 p-2 border rounded-lg text-sm bg-gray-50">
+            </div>
+
+            <div class="mb-4">
+                <p class="text-xs text-gray-500 mb-2">商品/收據照片 (可多張)</p>
+                <div class="flex flex-wrap gap-2" id="photoGallery">
+                    <label class="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50">
+                        <span class="text-2xl text-gray-400">+</span>
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)">
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="saveRecord()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold active:bg-blue-700">儲存這筆帳單</button>
+        </div>
+
+        <h2 class="font-bold text-gray-700 mb-3">今日花費明細</h2>
+        <div id="historyList" class="space-y-3">
+            </div>
+    </div>
+
+    <script>
+        // 設定今日日期預設值
+        document.getElementById('date').valueAsDate = new Date();
+
+        function updateExchangeRate() {
+            const curr = document.getElementById('currency').value;
+            const rateInput = document.getElementById('rate');
+            const unit = document.getElementById('unit');
+            if(curr === 'KRW') { rateInput.value = 42; unit.innerText = 'KRW'; }
+            if(curr === 'THB') { rateInput.value = 1.1; unit.innerText = 'THB'; }
+            if(curr === 'JPY') { rateInput.value = 4.6; unit.innerText = 'JPY'; }
+            calcTWD();
+        }
+
+        function calcTWD() {
+            const local = document.getElementById('localPrice').value;
+            const rate = document.getElementById('rate').value;
+            const twd = local > 0 ? Math.round(local / rate) : 0;
+            document.getElementById('twdPrice').value = twd;
+        }
+
+        function handlePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'photo-preview';
+                    document.getElementById('photoGallery').prepend(img);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function saveRecord() {
+            const store = document.getElementById('storeName').value || '未分類店家';
+            const local = document.getElementById('localPrice').value;
+            const twd = document.getElementById('twdPrice').value;
+            const cat = document.getElementById('category').value;
+            const curr = document.getElementById('currency').value;
+            
+            if(!local) { alert('請輸入金額'); return; }
+
+            const item = `
+                <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-bold">${store} <span class="text-xs font-normal text-gray-400">${cat}</span></div>
+                            <div class="text-lg text-blue-600 font-bold">${curr} ${local} <span class="text-gray-400 text-sm">≈ NT$ ${twd}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('historyList').innerHTML = item + document.getElementById('historyList').innerHTML;
+            
+            // 清除輸入
+            document.getElementById('localPrice').value = '';
+            document.getElementById('twdPrice').value = '0';
+            document.getElementById('photoGallery').innerHTML = '<label class="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"><span class="text-2xl text-gray-400">+</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)"></label>';
+        }
+    </script>
+</body>
+</html>
