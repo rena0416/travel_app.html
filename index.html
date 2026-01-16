@@ -3,133 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅遊拍照記帳助手</title>
+    <title>波波旅遊記帳本 🐾</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        .photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fff5f7; }
+        .cute-card { border-radius: 20px; border: 2px solid #ffcad4; }
+        .btn-pink { background-color: #ffb3c1; color: white; border-radius: 15px; transition: all 0.2s; }
+        .btn-pink:active { background-color: #fb6f92; transform: scale(0.95); }
+        .summary-box { background-color: #ffe5ec; border-radius: 15px; }
+        .tab-active { border-bottom: 4px solid #fb6f92; color: #fb6f92; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen pb-20">
+<body class="pb-24">
 
-    <div class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-md">
-        <h1 class="text-xl font-bold text-center">我的旅遊帳本</h1>
-        <div class="flex justify-between mt-3 text-sm">
-            <select id="currency" class="bg-blue-500 border border-blue-400 rounded px-2 py-1" onchange="updateExchangeRate()">
-                <option value="KRW">韓國 (KRW)</option>
-                <option value="THB">泰國 (THB)</option>
-                <option value="JPY">日本 (JPY)</option>
+    <div class="bg-[#ffb3c1] text-white p-6 rounded-b-[40px] shadow-lg text-center">
+        <h1 class="text-2xl font-bold italic">Travel Diary ✨</h1>
+        <div class="flex justify-center items-center gap-2 mt-2 text-sm">
+            <span>匯率 1 TWD = </span>
+            <input type="number" id="rate" value="42" class="w-12 bg-white/30 rounded text-center outline-none">
+            <select id="currency" class="bg-transparent font-bold outline-none" onchange="updateCurrencyText()">
+                <option value="KRW">韓圓 ₩</option>
+                <option value="THB">泰銖 ฿</option>
+                <option value="JPY">日圓 ¥</option>
             </select>
-            <div>
-                匯率: 1 TWD = <input type="number" id="rate" value="42" class="w-16 bg-blue-500 border-b border-white text-center outline-none"> <span id="unit">KRW</span>
-            </div>
         </div>
     </div>
 
-    <div class="p-4">
-        <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                    <label class="block text-xs text-gray-500">當地金額</label>
-                    <input type="number" id="localPrice" placeholder="0" class="w-full text-2xl font-bold border-b border-gray-200 outline-none" oninput="calcTWD()">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500">換算台幣 (TWD)</label>
-                    <input type="text" id="twdPrice" readonly class="w-full text-2xl font-bold text-blue-600 border-b border-gray-200" value="0">
-                </div>
-            </div>
+    <div class="px-4 -mt-5">
+        <div class="bg-white cute-card p-4 shadow-md flex flex-wrap gap-2 justify-around text-center">
+            <div><p class="text-[10px] text-gray-400">當日總計</p><p class="font-bold text-pink-500" id="totalDay">NT$ 0</p></div>
+            <div><p class="text-[10px] text-gray-400">🛍️ 購物</p><p class="font-bold text-blue-400" id="totalShop">NT$ 0</p></div>
+            <div><p class="text-[10px] text-gray-400">🍱 美食</p><p class="font-bold text-orange-400" id="totalEat">NT$ 0</p></div>
+            <div><p class="text-[10px] text-gray-400">🚌 交通</p><p class="font-bold text-green-500" id="totalTrans">NT$ 0</p></div>
+        </div>
+    </div>
 
-            <div class="mb-3">
-                <input type="text" id="storeName" placeholder="店家名稱 (如: Olive Young)" class="w-full p-2 border rounded-lg text-sm">
-            </div>
-
-            <div class="flex gap-2 mb-4">
-                <select id="category" class="flex-1 p-2 border rounded-lg text-sm bg-gray-50">
-                    <option>🛍️ 購物</option>
-                    <option>🍱 美食</option>
-                    <option>🚌 交通</option>
-                    <option>🏨 住宿</option>
-                </select>
-                <input type="date" id="date" class="flex-1 p-2 border rounded-lg text-sm bg-gray-50">
+    <div class="p-4 space-y-4">
+        <div class="bg-white cute-card p-5 shadow-sm">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="flex-1">
+                    <label class="text-xs text-pink-400 font-bold">當地金額</label>
+                    <input type="number" id="localPrice" placeholder="0" class="w-full text-2xl font-bold text-gray-700 outline-none border-b-2 border-pink-100 focus:border-pink-300" oninput="calcTWD()">
+                </div>
+                <div class="text-2xl text-pink-300 mt-4">➔</div>
+                <div class="flex-1 text-right">
+                    <label class="text-xs text-pink-400 font-bold">台幣 NT$</label>
+                    <div id="twdPrice" class="text-2xl font-bold text-pink-500">0</div>
+                </div>
             </div>
 
             <div class="mb-4">
-                <p class="text-xs text-gray-500 mb-2">商品/收據照片 (可多張)</p>
+                <input type="text" id="storeName" placeholder="📍 在哪裡花的？(例：Olive Young)" class="w-full p-3 bg-gray-50 rounded-xl text-sm outline-none border border-transparent focus:border-pink-200">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">類別</label>
+                    <select id="mainCat" class="w-full p-3 bg-pink-50 rounded-xl text-sm outline-none" onchange="updateSubCat()">
+                        <option value="購物">🛍️ 購物</option>
+                        <option value="美食">🍱 美食</option>
+                        <option value="交通">🚌 交通</option>
+                        <option value="住宿">🏨 住宿</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 ml-1">細項</label>
+                    <select id="subCat" class="w-full p-3 bg-pink-50 rounded-xl text-sm outline-none">
+                        </select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="text-xs text-gray-400 ml-1">付款方式</label>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    <select id="payMethod" class="w-full p-3 bg-blue-50 rounded-xl text-sm outline-none">
+                        <option>💵 現金</option>
+                        <option>💳 信用卡</option>
+                        <option>🍎 Apple Pay</option>
+                        <option>💚 LINE Pay</option>
+                        <option>🚌 T-Money / 交通卡</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-gray-400 ml-1">拍下寶貝商品 (可多張)</span>
+                </div>
                 <div class="flex flex-wrap gap-2" id="photoGallery">
-                    <label class="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50">
-                        <span class="text-2xl text-gray-400">+</span>
+                    <label class="w-16 h-16 border-2 border-dashed border-pink-200 rounded-2xl flex items-center justify-center cursor-pointer bg-pink-50/50">
+                        <span class="text-2xl text-pink-300">+</span>
                         <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)">
                     </label>
                 </div>
             </div>
 
-            <button onclick="saveRecord()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold active:bg-blue-700">儲存這筆帳單</button>
+            <button onclick="saveRecord()" class="w-full btn-pink py-4 font-bold shadow-lg shadow-pink-100">紀錄這一筆 🐾</button>
         </div>
 
-        <h2 class="font-bold text-gray-700 mb-3">今日花費明細</h2>
-        <div id="historyList" class="space-y-3">
+        <div id="historyList" class="space-y-4 pb-10">
             </div>
     </div>
 
     <script>
-        // 設定今日日期預設值
-        document.getElementById('date').valueAsDate = new Date();
+        const subCats = {
+            '購物': ['美妝', '服飾', '零食', '文具', '藥妝', '其它'],
+            '美食': ['正餐', '甜點', '咖啡廳', '超商', '夜市'],
+            '交通': ['計程車', '公車', '捷運', '機場巴士', '火車'],
+            '住宿': ['飯店', '民宿', '行李寄放']
+        };
 
-        function updateExchangeRate() {
-            const curr = document.getElementById('currency').value;
-            const rateInput = document.getElementById('rate');
-            const unit = document.getElementById('unit');
-            if(curr === 'KRW') { rateInput.value = 42; unit.innerText = 'KRW'; }
-            if(curr === 'THB') { rateInput.value = 1.1; unit.innerText = 'THB'; }
-            if(curr === 'JPY') { rateInput.value = 4.6; unit.innerText = 'JPY'; }
-            calcTWD();
+        let dailyTotals = { 總計: 0, 購物: 0, 美食: 0, 交通: 0 };
+
+        function updateSubCat() {
+            const main = document.getElementById('mainCat').value;
+            const subSelect = document.getElementById('subCat');
+            subSelect.innerHTML = subCats[main].map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
         function calcTWD() {
             const local = document.getElementById('localPrice').value;
             const rate = document.getElementById('rate').value;
             const twd = local > 0 ? Math.round(local / rate) : 0;
-            document.getElementById('twdPrice').value = twd;
+            document.getElementById('twdPrice').innerText = twd.toLocaleString();
+            return twd;
         }
 
         function handlePhoto(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'photo-preview';
-                    document.getElementById('photoGallery').prepend(img);
+                    const div = document.createElement('div');
+                    div.className = 'relative w-16 h-16';
+                    div.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 object-cover rounded-xl border border-pink-100 shadow-sm">`;
+                    document.getElementById('photoGallery').prepend(div);
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function saveRecord() {
-            const store = document.getElementById('storeName').value || '未分類店家';
             const local = document.getElementById('localPrice').value;
-            const twd = document.getElementById('twdPrice').value;
-            const cat = document.getElementById('category').value;
-            const curr = document.getElementById('currency').value;
+            if(!local) return alert('親愛的，還沒輸入金額喔！');
             
-            if(!local) { alert('請輸入金額'); return; }
+            const store = document.getElementById('storeName').value || '神祕的小店';
+            const twd = calcTWD();
+            const mainCat = document.getElementById('mainCat').value;
+            const subCat = document.getElementById('subCat').value;
+            const pay = document.getElementById('payMethod').value;
+            const photos = Array.from(document.querySelectorAll('#photoGallery img')).map(img => img.src);
 
-            const item = `
-                <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <div class="font-bold">${store} <span class="text-xs font-normal text-gray-400">${cat}</span></div>
-                            <div class="text-lg text-blue-600 font-bold">${curr} ${local} <span class="text-gray-400 text-sm">≈ NT$ ${twd}</span></div>
+            // 更新統計
+            dailyTotals.總計 += twd;
+            if(mainCat === '購物') dailyTotals.購物 += twd;
+            if(mainCat === '美食') dailyTotals.美食 += twd;
+            if(mainCat === '交通') dailyTotals.交通 += twd;
+            refreshSummary();
+
+            const recordHtml = `
+                <div class="bg-white cute-card p-4 shadow-sm border-r-8 ${mainCat==='購物'?'border-blue-200':mainCat==='美食'?'border-orange-200':'border-green-200'}">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-[10px] bg-pink-100 text-pink-500 px-2 py-0.5 rounded-full">${mainCat} · ${subCat}</span>
+                        <span class="text-[10px] text-gray-400">${pay}</span>
+                    </div>
+                    <div class="flex gap-3">
+                        ${photos.length > 0 ? `<img src="${photos[0]}" class="w-16 h-16 rounded-lg object-cover">` : ''}
+                        <div class="flex-1">
+                            <div class="font-bold text-gray-700">${store}</div>
+                            <div class="text-sm text-gray-400 italic">${document.getElementById('currency').value} ${local}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-pink-500">NT$ ${twd.toLocaleString()}</div>
                         </div>
                     </div>
                 </div>
             `;
-            document.getElementById('historyList').innerHTML = item + document.getElementById('historyList').innerHTML;
             
-            // 清除輸入
-            document.getElementById('localPrice').value = '';
-            document.getElementById('twdPrice').value = '0';
-            document.getElementById('photoGallery').innerHTML = '<label class="w-20 h-20 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer"><span class="text-2xl text-gray-400">+</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)"></label>';
+            document.getElementById('historyList').insertAdjacentHTML('afterbegin', recordHtml);
+            resetForm();
         }
+
+        function refreshSummary() {
+            document.getElementById('totalDay').innerText = `NT$ ${dailyTotals.總計.toLocaleString()}`;
+            document.getElementById('totalShop').innerText = `NT$ ${dailyTotals.購物.toLocaleString()}`;
+            document.getElementById('totalEat').innerText = `NT$ ${dailyTotals.美食.toLocaleString()}`;
+            document.getElementById('totalTrans').innerText = `NT$ ${dailyTotals.交通.toLocaleString()}`;
+        }
+
+        function resetForm() {
+            document.getElementById('localPrice').value = '';
+            document.getElementById('twdPrice').innerText = '0';
+            document.getElementById('storeName').value = '';
+            document.getElementById('photoGallery').innerHTML = '<label class="w-16 h-16 border-2 border-dashed border-pink-200 rounded-2xl flex items-center justify-center cursor-pointer bg-pink-50/50"><span class="text-2xl text-pink-300">+</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)"></label>';
+        }
+
+        // 初始化
+        updateSubCat();
     </script>
 </body>
 </html>
