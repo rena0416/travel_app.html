@@ -12,7 +12,7 @@
         .btn-pink { background: linear-gradient(135deg, #ffb3c1 0%, #fb6f92 100%); color: white; border-radius: 18px; transition: all 0.2s; }
         .input-style { background-color: #fdf2f5; border-radius: 12px; padding: 12px; font-size: 14px; outline: none; border: 1px solid transparent; width: 100%; }
         .input-style:focus { border-color: #ffb3c1; background-color: #fff; }
-        .photo-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .photo-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; border: 2px solid #fff; shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .stat-box { background: #fff1f3; border-radius: 15px; padding: 8px; text-align: center; flex: 1; border: 1px solid #ffe5ec; }
     </style>
 </head>
@@ -43,7 +43,8 @@
                     <label class="text-[11px] text-pink-400 font-bold ml-1">📅 消費日期</label>
                     <input type="date" id="consumeDate" class="input-style mt-1">
                 </div>
-                <div class="w-[1px] h-10 bg-pink-100 mb-1"></div> <div class="flex-1">
+                <div class="w-[1px] h-10 bg-pink-100 mb-1"></div>
+                <div class="flex-1">
                     <label class="text-[11px] text-pink-400 font-bold ml-1">💱 匯率 (1 TWD=)</label>
                     <input type="number" id="rate" value="42" class="input-style mt-1 font-bold text-pink-500" oninput="calcTWD()">
                 </div>
@@ -98,7 +99,7 @@
                         <option>🍎 Apple Pay</option>
                         <option>💚 LINE Pay</option>
                         <option>🚌 T-Money / 交通卡</option>
-                        </select>
+                    </select>
                 </div>
             </div>
 
@@ -115,7 +116,6 @@
             '住宿': ['飯店','民宿','行李寄放']
         };
 
-        // 統計數據
         let stats = { total: 0, 購物: 0, 美食: 0, 交通: 0 };
 
         function updateSubCat() {
@@ -154,16 +154,36 @@
             const mainCat = document.getElementById('mainCat').value;
             if(!local) return alert('請輸入金額！');
 
-            // 更新畫面統計 (當次有效)
-            stats.total += twd;
-            if(stats.hasOwnProperty(mainCat)) stats[mainCat] += twd;
-            updateSummaryDisplay();
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerHTML = '同步中...';
 
-            // --- 串接 Google Form 代碼 ---
-            // await fetch(...) 
-            
-            alert('✅ 儲存成功！統計已更新');
-            resetForm();
+            // --- 這裡已經幫你填好 Google Form 的資訊囉！ ---
+            const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfkJm425FSgJCSdUVmf4CPwZBjk6044tLawHbux_5BmaUrzcQ/formResponse"; 
+            const formData = new FormData();
+            formData.append("entry.853015480", document.getElementById('consumeDate').value);
+            formData.append("entry.2140133425", document.getElementById('storeName').value);
+            formData.append("entry.372779388", local);
+            formData.append("entry.1882152648", twd);
+            formData.append("entry.2106291780", mainCat);
+            formData.append("entry.1707064398", document.getElementById('subCat').value);
+            formData.append("entry.1382434985", document.getElementById('payMethod').value);
+
+            try {
+                await fetch(FORM_URL, { method: "POST", body: formData, mode: "no-cors" });
+                
+                stats.total += twd;
+                if(stats.hasOwnProperty(mainCat)) stats[mainCat] += twd;
+                updateSummaryDisplay();
+
+                alert('✅ 儲存成功！');
+                resetForm();
+            } catch (error) {
+                alert('❌ 儲存失敗');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '上傳雲端存檔 ☁️';
+            }
         }
 
         function updateSummaryDisplay() {
