@@ -3,64 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>波波旅遊記帳本 🐾</title>
+    <title>波波旅遊相機記帳 ✨</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fff5f7; }
-        .cute-card { border-radius: 20px; border: 2px solid #ffcad4; }
-        .btn-pink { background-color: #ffb3c1; color: white; border-radius: 15px; transition: all 0.2s; }
-        .btn-pink:active { background-color: #fb6f92; transform: scale(0.95); }
-        .summary-box { background-color: #ffe5ec; border-radius: 15px; }
-        .tab-active { border-bottom: 4px solid #fb6f92; color: #fb6f92; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #fffafb; }
+        .cute-card { border-radius: 24px; border: 2px solid #ffe5ec; background: white; }
+        .btn-pink { background: linear-gradient(135deg, #ffb3c1 0%, #fb6f92 100%); color: white; border-radius: 18px; transition: all 0.2s; }
+        .btn-pink:active { transform: scale(0.95); opacity: 0.9; }
+        .input-style { background-color: #fdf2f5; border-radius: 12px; padding: 12px; font-size: 14px; outline: none; border: 1px solid transparent; width: 100%; }
+        .input-style:focus { border-color: #ffb3c1; background-color: #fff; }
+        .photo-thumb { width: 70px; height: 70px; object-fit: cover; border-radius: 12px; border: 2px solid #fff; shadow: 0 2px 5px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-20">
 
-    <div class="bg-[#ffb3c1] text-white p-6 rounded-b-[40px] shadow-lg text-center">
-        <h1 class="text-2xl font-bold italic">Travel Diary ✨</h1>
-        <div class="flex justify-center items-center gap-2 mt-2 text-sm">
-            <span>匯率 1 TWD = </span>
-            <input type="number" id="rate" value="42" class="w-12 bg-white/30 rounded text-center outline-none">
-            <select id="currency" class="bg-transparent font-bold outline-none" onchange="updateCurrencyText()">
-                <option value="KRW">韓圓 ₩</option>
-                <option value="THB">泰銖 ฿</option>
-                <option value="JPY">日圓 ¥</option>
-            </select>
-        </div>
+    <div class="bg-[#ffb3c1] text-white pt-8 pb-10 px-6 rounded-b-[50px] shadow-lg relative">
+        <h1 class="text-2xl font-bold italic text-center">Travel Memories 📸</h1>
+        <p class="text-center text-xs opacity-90 mt-1">拍照 × 匯率 × 雲端同步</p>
     </div>
 
-    <div class="px-4 -mt-5">
-        <div class="bg-white cute-card p-4 shadow-md flex flex-wrap gap-2 justify-around text-center">
-            <div><p class="text-[10px] text-gray-400">當日總計</p><p class="font-bold text-pink-500" id="totalDay">NT$ 0</p></div>
-            <div><p class="text-[10px] text-gray-400">🛍️ 購物</p><p class="font-bold text-blue-400" id="totalShop">NT$ 0</p></div>
-            <div><p class="text-[10px] text-gray-400">🍱 美食</p><p class="font-bold text-orange-400" id="totalEat">NT$ 0</p></div>
-            <div><p class="text-[10px] text-gray-400">🚌 交通</p><p class="font-bold text-green-500" id="totalTrans">NT$ 0</p></div>
-        </div>
-    </div>
-
-    <div class="p-4 space-y-4">
-        <div class="bg-white cute-card p-5 shadow-sm">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="flex-1">
-                    <label class="text-xs text-pink-400 font-bold">當地金額</label>
-                    <input type="number" id="localPrice" placeholder="0" class="w-full text-2xl font-bold text-gray-700 outline-none border-b-2 border-pink-100 focus:border-pink-300" oninput="calcTWD()">
+    <div class="p-4 -mt-6 space-y-4">
+        <div class="cute-card p-6 shadow-xl">
+            
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div>
+                    <label class="text-[10px] text-pink-400 font-bold ml-1">📅 消費日期</label>
+                    <input type="date" id="consumeDate" class="input-style mt-1">
                 </div>
-                <div class="text-2xl text-pink-300 mt-4">➔</div>
-                <div class="flex-1 text-right">
-                    <label class="text-xs text-pink-400 font-bold">台幣 NT$</label>
+                <div>
+                    <label class="text-[10px] text-pink-400 font-bold ml-1">💱 1 TWD 換多少?</label>
+                    <input type="number" id="rate" value="42" class="input-style mt-1 font-bold text-pink-500">
+                </div>
+            </div>
+
+            <div class="bg-pink-50 rounded-2xl p-4 mb-4 flex items-center justify-between border border-pink-100">
+                <div class="w-1/2">
+                    <label class="text-[10px] text-gray-500">當地金額</label>
+                    <input type="number" id="localPrice" placeholder="0" class="bg-transparent text-2xl font-bold w-full outline-none" oninput="calcTWD()">
+                </div>
+                <div class="text-pink-300 text-xl font-bold px-2">≈</div>
+                <div class="w-1/2 text-right">
+                    <label class="text-[10px] text-gray-500">台幣 NT$</label>
                     <div id="twdPrice" class="text-2xl font-bold text-pink-500">0</div>
                 </div>
             </div>
 
             <div class="mb-4">
-                <input type="text" id="storeName" placeholder="📍 在哪裡花的？(例：Olive Young)" class="w-full p-3 bg-gray-50 rounded-xl text-sm outline-none border border-transparent focus:border-pink-200">
+                <label class="text-[10px] text-gray-400 font-bold ml-1">📷 拍下戰利品/收據 (可拍多張)</label>
+                <div class="flex flex-wrap gap-2 mt-2" id="photoGallery">
+                    <label class="w-[70px] h-[70px] border-2 border-dashed border-pink-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer bg-pink-50/30 hover:bg-pink-50">
+                        <span class="text-xl text-pink-300">+</span>
+                        <span class="text-[8px] text-pink-300 font-bold">拍照</span>
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)">
+                    </label>
+                </div>
             </div>
 
+            <div class="mb-4">
+                <label class="text-[10px] text-gray-400 font-bold ml-1">📍 店家名稱</label>
+                <input type="text" id="storeName" placeholder="例如：Olive Young、大創" class="input-style mt-1">
+            </div>
+            
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                    <label class="text-xs text-gray-400 ml-1">類別</label>
-                    <select id="mainCat" class="w-full p-3 bg-pink-50 rounded-xl text-sm outline-none" onchange="updateSubCat()">
+                    <label class="text-[10px] text-gray-400 font-bold ml-1">🏷️ 主分類</label>
+                    <select id="mainCat" class="input-style mt-1" onchange="updateSubCat()">
                         <option value="購物">🛍️ 購物</option>
                         <option value="美食">🍱 美食</option>
                         <option value="交通">🚌 交通</option>
@@ -68,59 +76,43 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-xs text-gray-400 ml-1">細項</label>
-                    <select id="subCat" class="w-full p-3 bg-pink-50 rounded-xl text-sm outline-none">
-                        </select>
+                    <label class="text-[10px] text-gray-400 font-bold ml-1">✨ 細項</label>
+                    <select id="subCat" class="input-style mt-1"></select>
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="text-xs text-gray-400 ml-1">付款方式</label>
-                <div class="flex flex-wrap gap-2 mt-1">
-                    <select id="payMethod" class="w-full p-3 bg-blue-50 rounded-xl text-sm outline-none">
-                        <option>💵 現金</option>
-                        <option>💳 信用卡</option>
-                        <option>🍎 Apple Pay</option>
-                        <option>💚 LINE Pay</option>
-                        <option>🚌 T-Money / 交通卡</option>
-                    </select>
-                </div>
+            <div class="mb-6">
+                <label class="text-[10px] text-gray-400 font-bold ml-1">💳 付款方式</label>
+                <select id="payMethod" class="input-style mt-1">
+                    <option>💵 現金</option>
+                    <option>💳 信用卡</option>
+                    <option>🍎 Apple Pay</option>
+                    <option>💚 LINE Pay</option>
+                    <option>🚌 T-Money / 交通卡</option>
+                </select>
             </div>
 
-            <div class="mb-5">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs text-gray-400 ml-1">拍下寶貝商品 (可多張)</span>
-                </div>
-                <div class="flex flex-wrap gap-2" id="photoGallery">
-                    <label class="w-16 h-16 border-2 border-dashed border-pink-200 rounded-2xl flex items-center justify-center cursor-pointer bg-pink-50/50">
-                        <span class="text-2xl text-pink-300">+</span>
-                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)">
-                    </label>
-                </div>
-            </div>
-
-            <button onclick="saveRecord()" class="w-full btn-pink py-4 font-bold shadow-lg shadow-pink-100">紀錄這一筆 🐾</button>
+            <button id="saveBtn" onclick="saveToCloud()" class="w-full btn-pink py-4 font-bold text-lg shadow-lg shadow-pink-200">
+                同步到 Google 雲端 ☁️
+            </button>
         </div>
-
-        <div id="historyList" class="space-y-4 pb-10">
-            </div>
     </div>
 
     <script>
-        const subCats = {
-            '購物': ['美妝', '服飾', '零食', '文具', '藥妝', '其它'],
-            '美食': ['正餐', '甜點', '咖啡廳', '超商', '夜市'],
-            '交通': ['計程車', '公車', '捷運', '機場巴士', '火車'],
-            '住宿': ['飯店', '民宿', '行李寄放']
+        // 初始化
+        document.getElementById('consumeDate').valueAsDate = new Date();
+        const subCats = { 
+            '購物': ['美妝','服飾','零食','藥妝','其它'], 
+            '美食': ['正餐','甜點','咖啡廳','超商','小吃'], 
+            '交通': ['計程車','公車','捷運','機場巴士','火車'],
+            '住宿': ['飯店','民宿','行李寄放']
         };
-
-        let dailyTotals = { 總計: 0, 購物: 0, 美食: 0, 交通: 0 };
 
         function updateSubCat() {
             const main = document.getElementById('mainCat').value;
-            const subSelect = document.getElementById('subCat');
-            subSelect.innerHTML = subCats[main].map(s => `<option value="${s}">${s}</option>`).join('');
+            document.getElementById('subCat').innerHTML = subCats[main].map(s => `<option value="${s}">${s}</option>`).join('');
         }
+        updateSubCat();
 
         function calcTWD() {
             const local = document.getElementById('localPrice').value;
@@ -130,76 +122,61 @@
             return twd;
         }
 
+        // 處理拍照
         function handlePhoto(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const div = document.createElement('div');
-                    div.className = 'relative w-16 h-16';
-                    div.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 object-cover rounded-xl border border-pink-100 shadow-sm">`;
-                    document.getElementById('photoGallery').prepend(div);
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'photo-thumb';
+                    // 插入到拍照按鈕之前
+                    const gallery = document.getElementById('photoGallery');
+                    gallery.insertBefore(img, gallery.lastElementChild);
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function saveRecord() {
+        async function saveToCloud() {
+            const btn = document.getElementById('saveBtn');
             const local = document.getElementById('localPrice').value;
-            if(!local) return alert('親愛的，還沒輸入金額喔！');
-            
-            const store = document.getElementById('storeName').value || '神祕的小店';
-            const twd = calcTWD();
-            const mainCat = document.getElementById('mainCat').value;
-            const subCat = document.getElementById('subCat').value;
-            const pay = document.getElementById('payMethod').value;
-            const photos = Array.from(document.querySelectorAll('#photoGallery img')).map(img => img.src);
+            if(!local) return alert('親愛的，忘了填金額囉！');
 
-            // 更新統計
-            dailyTotals.總計 += twd;
-            if(mainCat === '購物') dailyTotals.購物 += twd;
-            if(mainCat === '美食') dailyTotals.美食 += twd;
-            if(mainCat === '交通') dailyTotals.交通 += twd;
-            refreshSummary();
+            btn.disabled = true;
+            btn.innerHTML = '努力同步中...';
 
-            const recordHtml = `
-                <div class="bg-white cute-card p-4 shadow-sm border-r-8 ${mainCat==='購物'?'border-blue-200':mainCat==='美食'?'border-orange-200':'border-green-200'}">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-[10px] bg-pink-100 text-pink-500 px-2 py-0.5 rounded-full">${mainCat} · ${subCat}</span>
-                        <span class="text-[10px] text-gray-400">${pay}</span>
-                    </div>
-                    <div class="flex gap-3">
-                        ${photos.length > 0 ? `<img src="${photos[0]}" class="w-16 h-16 rounded-lg object-cover">` : ''}
-                        <div class="flex-1">
-                            <div class="font-bold text-gray-700">${store}</div>
-                            <div class="text-sm text-gray-400 italic">${document.getElementById('currency').value} ${local}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-pink-500">NT$ ${twd.toLocaleString()}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('historyList').insertAdjacentHTML('afterbegin', recordHtml);
-            resetForm();
+            // --- 此處填寫您的 Google 表單 IDs ---
+            const GOOGLE_FORM_URL = "您的_GOOGLE_FORM_RESPONSE_URL"; 
+            const formData = new FormData();
+            formData.append("entry.日期ID", document.getElementById('consumeDate').value);
+            formData.append("entry.店家ID", document.getElementById('storeName').value);
+            formData.append("entry.當地金額ID", local);
+            formData.append("entry.台幣金額ID", calcTWD());
+            formData.append("entry.主分類ID", document.getElementById('mainCat').value);
+            formData.append("entry.子分類ID", document.getElementById('subCat').value);
+            formData.append("entry.付款ID", document.getElementById('payMethod').value);
+
+            try {
+                await fetch(GOOGLE_FORM_URL, { method: "POST", body: formData, mode: "no-cors" });
+                alert('✅ 儲存成功！Excel 已更新');
+                
+                // 清除輸入
+                document.getElementById('localPrice').value = '';
+                document.getElementById('storeName').value = '';
+                document.getElementById('twdPrice').innerText = '0';
+                // 清除照片牆 (保留拍照按鈕)
+                const gallery = document.getElementById('photoGallery');
+                while (gallery.childNodes.length > 2) {
+                    gallery.removeChild(gallery.firstChild);
+                }
+            } catch (error) {
+                alert('❌ 儲存失敗，請檢查網路');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '同步到 Google 雲端 ☁️';
+            }
         }
-
-        function refreshSummary() {
-            document.getElementById('totalDay').innerText = `NT$ ${dailyTotals.總計.toLocaleString()}`;
-            document.getElementById('totalShop').innerText = `NT$ ${dailyTotals.購物.toLocaleString()}`;
-            document.getElementById('totalEat').innerText = `NT$ ${dailyTotals.美食.toLocaleString()}`;
-            document.getElementById('totalTrans').innerText = `NT$ ${dailyTotals.交通.toLocaleString()}`;
-        }
-
-        function resetForm() {
-            document.getElementById('localPrice').value = '';
-            document.getElementById('twdPrice').innerText = '0';
-            document.getElementById('storeName').value = '';
-            document.getElementById('photoGallery').innerHTML = '<label class="w-16 h-16 border-2 border-dashed border-pink-200 rounded-2xl flex items-center justify-center cursor-pointer bg-pink-50/50"><span class="text-2xl text-pink-300">+</span><input type="file" accept="image/*" capture="environment" class="hidden" onchange="handlePhoto(this)"></label>';
-        }
-
-        // 初始化
-        updateSubCat();
     </script>
 </body>
 </html>
